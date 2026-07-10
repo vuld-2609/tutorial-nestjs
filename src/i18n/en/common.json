@@ -1,0 +1,4 @@
+{
+  "hello": "hello",
+  "greet": "Hello, {name}!"
+}
