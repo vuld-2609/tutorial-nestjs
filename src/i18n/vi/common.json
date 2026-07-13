@@ -1,4 +1,8 @@
 {
   "hello": "xin chào",
-  "greet": "Xin chào, {name}!"
+  "greet": "Xin chào, {name}!",
+  "errors": {
+    "already_exists": "{field} đã tồn tại trên hệ thống!",
+    "internal_server_error": "Có lỗi xảy ra từ phía Server"
+  }
 }

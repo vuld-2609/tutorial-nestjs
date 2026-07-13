@@ -9,7 +9,9 @@ import {
   QueryResolver,
 } from 'nestjs-i18n';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-
+import { UserModule } from './user/user.module';
+import { AuthModule } from './auth/auth.module';
+import { PrismaModule } from './prisma/prisma.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -19,7 +21,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       useFactory: (configService: ConfigService) => ({
         fallbackLanguage: configService.getOrThrow('FALLBACK_LANGUAGE'),
         loaderOptions: {
-          path: join(__dirname, '/i18n/'),
+          path: join(__dirname, '../i18n/'),
           watch: true,
         },
       }),
@@ -30,6 +32,10 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       ],
       inject: [ConfigService],
     }),
+    UserModule,
+    AuthModule,
+    PrismaModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],

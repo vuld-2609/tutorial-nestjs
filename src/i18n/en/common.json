@@ -1,4 +1,8 @@
 {
   "hello": "hello",
-  "greet": "Hello, {name}!"
+  "greet": "Hello, {name}!",
+  "errors": {
+    "already_exists": "{field} already exists in the system!",
+    "internal_server_error": "An error occurred on the server"
+  }
 }
