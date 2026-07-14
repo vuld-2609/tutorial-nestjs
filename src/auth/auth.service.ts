@@ -1,15 +1,20 @@
 import {
-  Injectable,
   ConflictException,
+  Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { I18nContext } from 'nestjs-i18n';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { TUSer } from 'src/types/users.type';
-import { CreateUserDto } from 'src/auth/dto/create-user.dto';
+
 import * as bcrypt from 'bcrypt';
-import { Prisma } from '../../generated/prisma/client';
+
+import { Prisma } from '@generated/prisma/client';
+
+import { CreateUserDto } from '@/auth/dto/create-user.dto';
+import { UserResponseDto, UserResponseWrapperDto } from '@/auth/dto/user-response.dto';
+import { PrismaService } from '@/prisma/prisma.service';
+import { TUSer } from '@/types/users.type';
+import { t } from '@/utils/i18n.util';
 
 @Injectable()
 export class AuthService {
@@ -18,32 +23,29 @@ export class AuthService {
     private readonly prismaService: PrismaService,
   ) {}
 
-  async create(dto: CreateUserDto) {
-    const i18n = I18nContext.current();
-
+  async create(dto: CreateUserDto): Promise<UserResponseWrapperDto> {
     try {
       const hashedPassword = await bcrypt.hash(dto.password, 10);
-      return await this.prismaService.user.create({
+      const user = await this.prismaService.user.create({
         data: {
           ...dto,
           password: hashedPassword,
         },
       });
+      return this.buildUserResponse(user);
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
         if (error.code === 'P2002') {
           const target = this.getUniqueConstraintFields(error.meta);
           throw new ConflictException(
-            i18n?.t('common.errors.already_exists', {
+            t('common.errors.already_exists', {
               args: { field: target ? target.join(', ') : 'Data' },
             }),
           );
         }
       }
 
-      throw new InternalServerErrorException(
-        i18n?.t('common.errors.internal_server_error'),
-      );
+      throw new InternalServerErrorException(t('common.errors.internal_server_error'));
     }
   }
 
@@ -57,7 +59,9 @@ export class AuthService {
 
   async findById(id: number) {
     const user = await this.prismaService.user.findUnique({ where: { id } });
-    if (!user) return null;
+    if (!user) {
+      throw new NotFoundException(t('common.errors.not_found', { args: { entity: 'User' } }));
+    }
 
     const { password: _password, ...safeUser } = user;
     return safeUser;
@@ -73,18 +77,13 @@ export class AuthService {
     return null;
   }
 
-  async login(user: TUSer) {
-    const payload = { email: user.email, sub: user.id };
+  async login(user: TUSer): Promise<UserResponseWrapperDto> {
+    return this.buildUserResponse(user);
+  }
 
-    return {
-      user: {
-        email: user.email,
-        token: this.jwtService.sign(payload),
-        username: user.username,
-        bio: user.bio,
-        image: user.image,
-      },
-    };
+  private buildUserResponse(user: TUSer): UserResponseWrapperDto {
+    const token = this.jwtService.sign({ email: user.email, sub: user.id });
+    return { user: new UserResponseDto(user, token) };
   }
 
   private getUniqueConstraintFields(

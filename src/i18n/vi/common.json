@@ -3,6 +3,8 @@
   "greet": "Xin chào, {name}!",
   "errors": {
     "already_exists": "{field} đã tồn tại trên hệ thống!",
-    "internal_server_error": "Có lỗi xảy ra từ phía Server"
+    "internal_server_error": "Có lỗi xảy ra từ phía Server",
+    "not_found": "Không tìm thấy {entity}",
+    "unauthorized": "Email hoặc mật khẩu không đúng"
   }
 }

@@ -1,0 +1,12 @@
+{
+  "username": {
+    "invalid": "Tên người dùng không hợp lệ",
+    "too_short": "Tên người dùng quá ngắn"
+  },
+  "email": {
+    "invalid": "Địa chỉ email không hợp lệ"
+  },
+  "password": {
+    "too_short": "Mật khẩu phải có ít nhất 6 ký tự"
+  }
+}

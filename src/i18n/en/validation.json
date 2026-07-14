@@ -1,0 +1,12 @@
+{
+  "username": {
+    "invalid": "Invalid username",
+    "too_short": "Username is too short"
+  },
+  "email": {
+    "invalid": "Invalid email address"
+  },
+  "password": {
+    "too_short": "Password must be at least 6 characters long"
+  }
+}

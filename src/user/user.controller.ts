@@ -1,8 +1,10 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
+
+import { JwtAuthGuard } from '@/guards/jwt-auth.guard';
+import { CurrentUser } from '@/passport/current-user.decorator';
+import type { TUSer } from '@/types/users.type';
+
 import { UserService } from './user.service';
-import { JwtAuthGuard } from 'src/guards/jwt-auth.guard';
-import { CurrentUser } from 'src/passport/current-user.decorator';
-import type { TUSer } from 'src/types/users.type';
 
 @Controller('user')
 export class UserController {
