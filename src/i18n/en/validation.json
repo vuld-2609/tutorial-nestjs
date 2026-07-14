@@ -7,6 +7,7 @@
     "invalid": "Invalid email address"
   },
   "password": {
-    "too_short": "Password must be at least 6 characters long"
+    "too_short": "Password must be at least 6 characters long",
+    "mismatch": "Password confirmation does not match"
   }
 }

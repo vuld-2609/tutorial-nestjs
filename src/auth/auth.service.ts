@@ -11,7 +11,12 @@ import * as bcrypt from 'bcrypt';
 import { Prisma } from '@generated/prisma/client';
 
 import { CreateUserDto } from '@/auth/dto/create-user.dto';
-import { UserResponseDto, UserResponseWrapperDto } from '@/auth/dto/user-response.dto';
+import {
+  UserProfileDto,
+  UserProfileWrapperDto,
+  UserResponseDto,
+  UserResponseWrapperDto,
+} from '@/auth/dto/user-response.dto';
 import { PrismaService } from '@/prisma/prisma.service';
 import { TUSer } from '@/types/users.type';
 import { t } from '@/utils/i18n.util';
@@ -81,7 +86,7 @@ export class AuthService {
     return this.buildUserResponse(user);
   }
 
-  private buildUserResponse(user: TUSer): UserResponseWrapperDto {
+  buildUserResponse(user: TUSer): UserResponseWrapperDto {
     const token = this.jwtService.sign({ email: user.email, sub: user.id });
     return { user: new UserResponseDto(user, token) };
   }

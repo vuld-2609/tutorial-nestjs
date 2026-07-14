@@ -7,6 +7,7 @@
     "invalid": "Địa chỉ email không hợp lệ"
   },
   "password": {
-    "too_short": "Mật khẩu phải có ít nhất 6 ký tự"
+    "too_short": "Mật khẩu phải có ít nhất 6 ký tự",
+    "mismatch": "Mật khẩu xác nhận không khớp"
   }
 }
