@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+
+import { AcceptLanguageResolver, HeaderResolver, I18nModule, QueryResolver } from 'nestjs-i18n';
 import { join } from 'path';
+
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import {
-  AcceptLanguageResolver,
-  HeaderResolver,
-  I18nModule,
-  QueryResolver,
-} from 'nestjs-i18n';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { AuthModule } from './auth/auth.module';
+import { PrismaModule } from './prisma/prisma.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -19,7 +19,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       useFactory: (configService: ConfigService) => ({
         fallbackLanguage: configService.getOrThrow('FALLBACK_LANGUAGE'),
         loaderOptions: {
-          path: join(__dirname, '/i18n/'),
+          path: join(__dirname, '../i18n/'),
           watch: true,
         },
       }),
@@ -30,6 +30,10 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       ],
       inject: [ConfigService],
     }),
+    UserModule,
+    AuthModule,
+    PrismaModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],
