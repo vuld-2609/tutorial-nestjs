@@ -18,9 +18,13 @@ export class UserResponseDto {
   @ApiProperty({ nullable: true })
   image: string | null;
 
-  constructor(user: TUSer, token: string) {
+  @ApiProperty({ nullable: true })
+  refreshToken: string | null;
+
+  constructor(user: TUSer, token: string, refreshToken: string | null) {
     this.email = user.email;
     this.token = token;
+    this.refreshToken = refreshToken;
     this.username = user.username;
     this.bio = user.bio ?? null;
     this.image = user.image ?? null;

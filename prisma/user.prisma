@@ -5,6 +5,8 @@ model User {
   password  String
   bio       String?
   image     String?
+  refreshToken String?
+  articles  Article[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -1,7 +1,14 @@
 import { OmitType, PartialType } from '@nestjs/swagger';
 
 import { Type } from 'class-transformer';
-import { IsOptional, IsString, IsUrl, MinLength, ValidateIf, ValidateNested } from 'class-validator';
+import {
+  IsOptional,
+  IsString,
+  IsUrl,
+  MinLength,
+  ValidateIf,
+  ValidateNested,
+} from 'class-validator';
 import { i18nValidationMessage } from 'nestjs-i18n';
 
 import { CreateUserDto } from '@/auth/dto/create-user.dto';
@@ -23,6 +30,10 @@ export class UpdateUserDto extends PartialType(OmitType(CreateUserDto, ['passwor
   @ValidateIf((dto: UpdateUserDto) => dto.newPassword !== undefined)
   @Match('newPassword', { message: i18nValidationMessage('validation.password.mismatch') })
   confirmNewPassword?: string;
+
+  @IsOptional()
+  @IsString()
+  refreshToken?: string;
 }
 
 export class UpdateUserWrapperDto {

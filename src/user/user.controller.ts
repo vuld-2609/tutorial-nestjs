@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Put, UseGuards } from '@nestjs/common';
 import { ApiOkResponse } from '@nestjs/swagger';
 
 import { UserProfileWrapperDto } from '@/auth/dto/user-response.dto';
@@ -27,5 +27,16 @@ export class UserController {
     @Body() updateUser: UpdateUserWrapperDto,
   ): Promise<UserProfileWrapperDto> {
     return this.userService.update(user.id, updateUser.user);
+  }
+
+  @Post('refresh-token')
+  refreshToken(@Body('refreshToken') refreshToken: string) {
+    return this.userService.refreshToken(refreshToken);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('logout')
+  logout(@CurrentUser() user: TUSer) {
+    return this.userService.logout(user.id);
   }
 }

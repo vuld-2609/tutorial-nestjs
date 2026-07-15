@@ -5,4 +5,5 @@ export type TUSer = {
   bio?: string | null;
   image?: string | null;
   token?: string;
+  refreshToken?: string | null;
 };

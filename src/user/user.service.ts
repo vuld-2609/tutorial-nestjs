@@ -1,9 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 
 import * as bcrypt from 'bcrypt';
 
 import { Prisma } from '@generated/prisma/client';
 
+import { AuthService } from '@/auth/auth.service';
 import { UserProfileDto, UserProfileWrapperDto } from '@/auth/dto/user-response.dto';
 import { PrismaService } from '@/prisma/prisma.service';
 import { TUSer } from '@/types/users.type';
@@ -13,7 +14,10 @@ import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly authService: AuthService,
+  ) {}
 
   toUserProfile(user: TUSer): UserProfileWrapperDto {
     return { user: new UserProfileDto(user) };
@@ -38,5 +42,29 @@ export class UserService {
       }
       throw error;
     }
+  }
+
+  async refreshToken(refreshToken: string) {
+    const payload = await this.authService.verifyRefreshTokenPayload(refreshToken);
+    const user = await this.authService.findById(payload.sub);
+
+    if (!user?.refreshToken) {
+      throw new UnauthorizedException(t('common.errors.access_denied'));
+    }
+
+    const isMatched = await bcrypt.compare(refreshToken, user.refreshToken);
+
+    if (!isMatched) {
+      throw new UnauthorizedException(t('common.errors.access_denied'));
+    }
+
+    const tokens = await this.authService.getTokens(user.id, user.email);
+    await this.authService.setRefreshToken(user.id, tokens.refreshToken);
+
+    return tokens;
+  }
+
+  async logout(userId: number) {
+    await this.authService.setRefreshToken(userId, null);
   }
 }
