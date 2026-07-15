@@ -9,5 +9,25 @@
   "password": {
     "too_short": "Mật khẩu phải có ít nhất 6 ký tự",
     "mismatch": "Mật khẩu xác nhận không khớp"
+  },
+  "article": {
+    "title": {
+      "invalid": "Tiêu đề phải là một chuỗi ký tự",
+      "empty": "Tiêu đề không được để trống",
+      "too_short": "Tiêu đề phải có ít nhất 5 ký tự",
+      "too_long": "Tiêu đề không được vượt quá 100 ký tự"
+    },
+    "description": {
+      "invalid": "Mô tả ngắn phải là chuỗi",
+      "empty": "Mô tả ngắn không được để trống"
+    },
+    "body": {
+      "invalid": "Nội dung bài viết phải là chuỗi",
+      "empty": "Nội dung bài viết không được để trống"
+    },
+    "tag_list": {
+      "invalid": "Tags phải là một mảng",
+      "invalid_item": "Tags phải là chuỗi"
+    }
   }
 }

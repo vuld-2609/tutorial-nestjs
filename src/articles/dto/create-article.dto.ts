@@ -6,30 +6,30 @@ import {
   IsString,
   MaxLength,
   MinLength,
-  Validate,
   ValidateNested,
 } from 'class-validator';
+import { i18nValidationMessage } from 'nestjs-i18n';
 
 export class CreateArticleDto {
-  @IsString({ message: 'Tiêu đề phải là một chuỗi ký tự' })
-  @IsNotEmpty({ message: 'Tiêu đề không được để trống' })
-  @MinLength(5, { message: 'Tiêu đề phải có ít nhất 5 ký tự' })
-  @MaxLength(100, { message: 'Tiêu đề không được vượt quá 100 ký tự' })
+  @IsString({ message: i18nValidationMessage('validation.article.title.invalid') })
+  @IsNotEmpty({ message: i18nValidationMessage('validation.article.title.empty') })
+  @MinLength(5, { message: i18nValidationMessage('validation.article.title.too_short') })
+  @MaxLength(100, { message: i18nValidationMessage('validation.article.title.too_long') })
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   title: string;
 
-  @IsString({ message: 'Mô tả ngắn phải là chuỗi' })
-  @IsNotEmpty({ message: 'Mô tả ngắn không được để trống' })
+  @IsString({ message: i18nValidationMessage('validation.article.description.invalid') })
+  @IsNotEmpty({ message: i18nValidationMessage('validation.article.description.empty') })
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   description: string;
 
-  @IsString({ message: 'Nội dung bài viết phải là chuỗi' })
-  @IsNotEmpty({ message: 'Nội dung bài viết không được để trống' })
+  @IsString({ message: i18nValidationMessage('validation.article.body.invalid') })
+  @IsNotEmpty({ message: i18nValidationMessage('validation.article.body.empty') })
   body: string;
 
-  @IsArray({ message: 'Tags phải là một mảng' })
+  @IsArray({ message: i18nValidationMessage('validation.article.tag_list.invalid') })
   @IsOptional()
-  @IsString({ each: true, message: 'Tags phải là chuỗi' })
+  @IsString({ each: true, message: i18nValidationMessage('validation.article.tag_list.invalid_item') })
   tagList: string[];
 }
 
