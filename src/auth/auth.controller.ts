@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Put, UseGuards } from '@nestjs/common';
 import { ApiOkResponse } from '@nestjs/swagger';
 
 import { CurrentUser } from '@/passport/current-user.decorator';

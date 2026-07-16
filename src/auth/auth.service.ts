@@ -3,7 +3,9 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 
 import * as bcrypt from 'bcrypt';
@@ -21,6 +23,7 @@ export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
     private readonly prismaService: PrismaService,
+    private readonly configService: ConfigService,
   ) {}
 
   async create(dto: CreateUserDto): Promise<UserResponseWrapperDto> {
@@ -81,9 +84,43 @@ export class AuthService {
     return this.buildUserResponse(user);
   }
 
-  private buildUserResponse(user: TUSer): UserResponseWrapperDto {
-    const token = this.jwtService.sign({ email: user.email, sub: user.id });
-    return { user: new UserResponseDto(user, token) };
+  async setRefreshToken(userId: number, refreshToken: string | null): Promise<void> {
+    const hashedToken = refreshToken ? await bcrypt.hash(refreshToken, 10) : null;
+    await this.prismaService.user.update({
+      where: { id: userId },
+      data: { refreshToken: hashedToken },
+    });
+  }
+
+  async verifyRefreshTokenPayload(refreshToken: string): Promise<{ sub: number; email: string }> {
+    try {
+      return await this.jwtService.verifyAsync(refreshToken);
+    } catch {
+      throw new UnauthorizedException(t('common.errors.unauthorized'));
+    }
+  }
+
+  async getTokens(userId: number, email: string) {
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwtService.signAsync({ email, sub: userId }),
+      this.jwtService.signAsync(
+        { email, sub: userId },
+        {
+          expiresIn: this.configService.get<string>(
+            'JWT_REFRESH_EXPIRES_IN',
+          ) as `${number}${'s' | 'm' | 'h' | 'd'}`,
+        },
+      ),
+    ]);
+
+    return { accessToken, refreshToken };
+  }
+
+  async buildUserResponse(user: TUSer): Promise<UserResponseWrapperDto> {
+    const { accessToken, refreshToken } = await this.getTokens(user.id, user.email);
+
+    await this.setRefreshToken(user.id, refreshToken);
+    return { user: new UserResponseDto(user, accessToken, refreshToken) };
   }
 
   private getUniqueConstraintFields(
@@ -98,5 +135,9 @@ export class AuthService {
     const driverAdapterError = meta.driverAdapterError as
       { cause?: { constraint?: { fields?: string[] } } } | undefined;
     return driverAdapterError?.cause?.constraint?.fields;
+  }
+
+  decodeToken(token: string) {
+    return this.jwtService.decode(token);
   }
 }

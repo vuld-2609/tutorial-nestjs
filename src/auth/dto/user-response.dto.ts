@@ -18,9 +18,13 @@ export class UserResponseDto {
   @ApiProperty({ nullable: true })
   image: string | null;
 
-  constructor(user: TUSer, token: string) {
+  @ApiProperty({ nullable: true })
+  refreshToken: string | null;
+
+  constructor(user: TUSer, token: string, refreshToken: string | null) {
     this.email = user.email;
     this.token = token;
+    this.refreshToken = refreshToken;
     this.username = user.username;
     this.bio = user.bio ?? null;
     this.image = user.image ?? null;
@@ -30,4 +34,30 @@ export class UserResponseDto {
 export class UserResponseWrapperDto {
   @ApiProperty({ type: UserResponseDto })
   user: UserResponseDto;
+}
+
+export class UserProfileDto {
+  @ApiProperty()
+  email: string;
+
+  @ApiProperty()
+  username: string;
+
+  @ApiProperty({ nullable: true })
+  bio: string | null;
+
+  @ApiProperty({ nullable: true })
+  image: string | null;
+
+  constructor(user: TUSer) {
+    this.email = user.email;
+    this.username = user.username;
+    this.bio = user.bio ?? null;
+    this.image = user.image ?? null;
+  }
+}
+
+export class UserProfileWrapperDto {
+  @ApiProperty({ type: UserProfileDto })
+  user: UserProfileDto;
 }

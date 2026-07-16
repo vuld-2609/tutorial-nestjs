@@ -5,6 +5,8 @@
     "already_exists": "{field} đã tồn tại trên hệ thống!",
     "internal_server_error": "Có lỗi xảy ra từ phía Server",
     "not_found": "Không tìm thấy {entity}",
-    "unauthorized": "Email hoặc mật khẩu không đúng"
+    "unauthorized": "Không có quyền truy cập",
+    "invalid_credentials": "Email hoặc mật khẩu không đúng",
+    "access_denied": "Truy cập bị từ chối"
   }
 }

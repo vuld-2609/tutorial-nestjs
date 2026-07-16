@@ -4,5 +4,8 @@ export type TUSer = {
   username: string;
   bio?: string | null;
   image?: string | null;
-  token?: string;
+};
+
+export type TAuthenticatedUser = TUSer & {
+  token: string;
 };

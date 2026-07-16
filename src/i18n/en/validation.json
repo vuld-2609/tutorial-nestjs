@@ -7,6 +7,27 @@
     "invalid": "Invalid email address"
   },
   "password": {
-    "too_short": "Password must be at least 6 characters long"
+    "too_short": "Password must be at least 6 characters long",
+    "mismatch": "Password confirmation does not match"
+  },
+  "article": {
+    "title": {
+      "invalid": "Title must be a string",
+      "empty": "Title must not be empty",
+      "too_short": "Title must be at least 5 characters long",
+      "too_long": "Title must not exceed 100 characters"
+    },
+    "description": {
+      "invalid": "Description must be a string",
+      "empty": "Description must not be empty"
+    },
+    "body": {
+      "invalid": "Body must be a string",
+      "empty": "Body must not be empty"
+    },
+    "tag_list": {
+      "invalid": "Tags must be an array",
+      "invalid_item": "Each tag must be a string"
+    }
   }
 }
