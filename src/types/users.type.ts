@@ -4,6 +4,8 @@ export type TUSer = {
   username: string;
   bio?: string | null;
   image?: string | null;
-  token?: string;
-  refreshToken?: string | null;
+};
+
+export type TAuthenticatedUser = TUSer & {
+  token: string;
 };

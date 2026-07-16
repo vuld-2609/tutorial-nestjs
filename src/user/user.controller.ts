@@ -4,7 +4,7 @@ import { ApiOkResponse } from '@nestjs/swagger';
 import { UserProfileWrapperDto } from '@/auth/dto/user-response.dto';
 import { JwtAuthGuard } from '@/guards/jwt-auth.guard';
 import { CurrentUser } from '@/passport/current-user.decorator';
-import type { TUSer } from '@/types/users.type';
+import type { TAuthenticatedUser } from '@/types/users.type';
 
 import { UpdateUserWrapperDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
@@ -15,7 +15,7 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Get()
-  me(@CurrentUser() user: TUSer) {
+  me(@CurrentUser() user: TAuthenticatedUser) {
     return this.userService.toUserProfile(user);
   }
 
@@ -23,7 +23,7 @@ export class UserController {
   @Put()
   @ApiOkResponse({ type: UserProfileWrapperDto })
   updateUser(
-    @CurrentUser() user: TUSer,
+    @CurrentUser() user: TAuthenticatedUser,
     @Body() updateUser: UpdateUserWrapperDto,
   ): Promise<UserProfileWrapperDto> {
     return this.userService.update(user.id, updateUser.user);
@@ -36,7 +36,7 @@ export class UserController {
 
   @UseGuards(JwtAuthGuard)
   @Post('logout')
-  logout(@CurrentUser() user: TUSer) {
-    return this.userService.logout(user.id);
+  logout(@CurrentUser() user: TAuthenticatedUser) {
+    return this.userService.logout(user.id, user.token);
   }
 }

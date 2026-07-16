@@ -2,7 +2,7 @@ import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 
 import { JwtAuthGuard } from '@/guards/jwt-auth.guard';
 import { CurrentUser } from '@/passport/current-user.decorator';
-import type { TUSer } from '@/types/users.type';
+import type { TAuthenticatedUser } from '@/types/users.type';
 
 import { ArticlesService } from './articles.service';
 import { CreateArticleWrapperDto } from './dto/create-article.dto';
@@ -14,7 +14,7 @@ export class ArticlesController {
   @UseGuards(JwtAuthGuard)
   @Post()
   async createArticle(
-    @CurrentUser() user: TUSer,
+    @CurrentUser() user: TAuthenticatedUser,
     @Body() createArticleDto: CreateArticleWrapperDto,
   ) {
     return this.articlesService.create(user.id, createArticleDto.article);

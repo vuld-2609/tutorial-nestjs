@@ -136,4 +136,8 @@ export class AuthService {
       { cause?: { constraint?: { fields?: string[] } } } | undefined;
     return driverAdapterError?.cause?.constraint?.fields;
   }
+
+  decodeToken(token: string) {
+    return this.jwtService.decode(token);
+  }
 }

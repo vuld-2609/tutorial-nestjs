@@ -7,6 +7,7 @@ import { Prisma } from '@generated/prisma/client';
 import { AuthService } from '@/auth/auth.service';
 import { UserProfileDto, UserProfileWrapperDto } from '@/auth/dto/user-response.dto';
 import { PrismaService } from '@/prisma/prisma.service';
+import { RedisService } from '@/redis/redis.service';
 import { TUSer } from '@/types/users.type';
 import { t } from '@/utils/i18n.util';
 
@@ -17,6 +18,7 @@ export class UserService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly authService: AuthService,
+    private readonly redisService: RedisService,
   ) {}
 
   toUserProfile(user: TUSer): UserProfileWrapperDto {
@@ -64,7 +66,20 @@ export class UserService {
     return tokens;
   }
 
-  async logout(userId: number) {
+  async logout(userId: number, token: string) {
+    const decoded = await this.authService.decodeToken(token);
+    if (!decoded || !decoded.exp) {
+      throw new UnauthorizedException(t('common.errors.unauthorized'));
+    }
+
+    const nowInSeconds = Math.floor(Date.now() / 1000);
+    const remainingTTL = decoded.exp - nowInSeconds;
+    if (remainingTTL > 0) {
+      await this.redisService.set(`blacklist:${token}`, 'true', remainingTTL);
+    }
+
     await this.authService.setRefreshToken(userId, null);
+
+    return { success: true };
   }
 }
