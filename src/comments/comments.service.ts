@@ -1,4 +1,9 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { ArticlesService } from '@/articles/articles.service';
 import { PrismaService } from '@/prisma/prisma.service';
@@ -70,22 +75,28 @@ export class CommentsService {
     };
   }
 
-  async deleteComment(id: number) {
+  async deleteComment(slug: string, id: number, userId: number) {
+    const article = await this.articleService.getArticle(slug);
+    if (!article) {
+      throw new NotFoundException(t('common.errors.not_found', { args: { entity: 'Article' } }));
+    }
+
     const existingComment = await this.prisma.comment.findUnique({
-      where: {
-        id,
-      },
+      where: { id },
+      select: { authorId: true, articleId: true },
     });
 
-    if (!existingComment) {
+    if (!existingComment || existingComment.articleId !== article.id) {
       throw new NotFoundException(t('common.errors.not_found', { args: { entity: 'Comment' } }));
+    }
+
+    if (existingComment.authorId !== userId) {
+      throw new ForbiddenException(t('common.errors.access_denied'));
     }
 
     try {
       await this.prisma.comment.delete({
-        where: {
-          id,
-        },
+        where: { id },
       });
 
       return { success: true };

@@ -1,12 +1,14 @@
-import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiBody, ApiOkResponse } from '@nestjs/swagger';
 
+import { SuccessResponseDto } from '@/common/dto/success-response.dto';
 import { JwtAuthGuard } from '@/guards/jwt-auth.guard';
 import { CurrentUser } from '@/passport/current-user.decorator';
 import type { TAuthenticatedUser } from '@/types/users.type';
 
 import { CommentsService } from './comments.service';
 import { CreateCommentDto, CreateCommentWrapperDto } from './dto/create-comment.dto';
+import { CommentListResponseDto, CommentResponseWrapperDto } from './dto/response-comment.dto';
 
 @Controller('articles/:slug/comments')
 @ApiBearerAuth('access-token')
@@ -16,6 +18,7 @@ export class CommentsController {
   @UseGuards(JwtAuthGuard)
   @Post()
   @ApiBody({ type: CreateCommentWrapperDto })
+  @ApiOkResponse({ type: CommentResponseWrapperDto })
   createComment(
     @CurrentUser() user: TAuthenticatedUser,
     @Param('slug') slug: string,
@@ -26,13 +29,19 @@ export class CommentsController {
 
   @UseGuards(JwtAuthGuard)
   @Get()
+  @ApiOkResponse({ type: CommentListResponseDto })
   findAllComments(@Param('slug') slug: string) {
     return this.commentsService.findAll(slug);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  deleteComment(@Param('id') id: number) {
-    return this.commentsService.deleteComment(id);
+  @ApiOkResponse({ type: SuccessResponseDto })
+  deleteComment(
+    @CurrentUser() user: TAuthenticatedUser,
+    @Param('slug') slug: string,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.commentsService.deleteComment(slug, id, user.id);
   }
 }

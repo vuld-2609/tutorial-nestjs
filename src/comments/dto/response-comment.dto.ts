@@ -1,8 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-import { Type } from 'class-transformer';
-import { ValidateNested } from 'class-validator';
-
 type CommentWithRelation = {
   id: number;
   articleId: number;
@@ -52,7 +49,11 @@ export class CommentResponseDto {
 }
 
 export class CommentResponseWrapperDto {
-  @ValidateNested()
-  @Type(() => CommentResponseDto)
+  @ApiProperty({ type: CommentResponseDto })
   comment: CommentResponseDto;
+}
+
+export class CommentListResponseDto {
+  @ApiProperty({ type: [CommentResponseDto] })
+  comments: CommentResponseDto[];
 }
