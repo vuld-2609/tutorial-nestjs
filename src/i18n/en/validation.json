@@ -29,5 +29,11 @@
       "invalid": "Tags must be an array",
       "invalid_item": "Each tag must be a string"
     }
+  },
+  "comment": {
+    "body": {
+      "invalid": "Comment must be a string",
+      "empty": "Comment must not be empty"
+    }
   }
 }

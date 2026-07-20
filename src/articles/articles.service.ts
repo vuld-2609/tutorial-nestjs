@@ -15,7 +15,11 @@ import { t } from '@/utils/i18n.util';
 
 import { CreateArticleDto } from './dto/create-article.dto';
 import { FindAllArticlesDto } from './dto/find-all-article.dto';
-import { ArticleResponseDto } from './dto/response-article.dto';
+import {
+  ArticleListResponseDto,
+  ArticleResponseDto,
+  PaginationMetaDto,
+} from './dto/response-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 
 @Injectable()
@@ -57,6 +61,9 @@ export class ArticlesService {
           tags: {
             select: { name: true },
           },
+          _count: {
+            select: { favorites: true },
+          },
         },
       });
 
@@ -69,10 +76,11 @@ export class ArticlesService {
     }
   }
 
-  async findAll(query: FindAllArticlesDto) {
-    const { limit, offset, author, tag } = query;
+  async findAll(query: FindAllArticlesDto, currentUserId?: number) {
+    const { limit, author, tag, page } = query;
 
     const where: Prisma.ArticleWhereInput = {};
+    const skip = (page - 1) * limit;
 
     if (author) {
       where.author = {
@@ -92,7 +100,7 @@ export class ArticlesService {
       this.prismaService.article.findMany({
         where,
         take: limit,
-        skip: offset,
+        skip,
         include: {
           author: {
             select: { username: true, bio: true, image: true },
@@ -100,15 +108,37 @@ export class ArticlesService {
           tags: {
             select: { name: true },
           },
+          _count: {
+            select: { favorites: true },
+          },
         },
       }),
       this.prismaService.article.count({ where }),
     ]);
 
-    return { articles: articles.map((article) => new ArticleResponseDto(article)), articlesCount };
+    const favoritedArticleIds = await this.getFavoritedArticleIds(
+      articles.map((article) => article.id),
+      currentUserId,
+    );
+
+    const totalPage = Math.ceil(articlesCount / limit);
+    const hasNextPage = page < totalPage;
+    const hasPreviousPage = page > 1;
+
+    return new ArticleListResponseDto(
+      articles.map((article) => new ArticleResponseDto(article, favoritedArticleIds.has(article.id))),
+      new PaginationMetaDto({
+        totalCount: articlesCount,
+        currentPage: page,
+        pageSize: limit,
+        hasNextPage,
+        hasPreviousPage,
+        totalPage,
+      }),
+    );
   }
 
-  async getBySlug(slug: string) {
+  async getBySlug(slug: string, currentUserId?: number) {
     const article = await this.prismaService.article.findUnique({
       where: { slug },
       include: {
@@ -118,6 +148,9 @@ export class ArticlesService {
         tags: {
           select: { name: true },
         },
+        _count: {
+          select: { favorites: true },
+        },
       },
     });
 
@@ -125,14 +158,49 @@ export class ArticlesService {
       throw new NotFoundException(t('common.errors.not_found', { args: { entity: 'Article' } }));
     }
 
-    return { article: new ArticleResponseDto(article) };
+    const favorited = await this.isFavoritedByUser(article.id, currentUserId);
+
+    return { article: new ArticleResponseDto(article, favorited) };
   }
 
-  async update(slug: string, userId: number, dto: UpdateArticleDto) {
-    const existingArticle = await this.prismaService.article.findUnique({
+  private async getFavoritedArticleIds(
+    articleIds: number[],
+    currentUserId?: number,
+  ): Promise<Set<number>> {
+    if (!currentUserId || articleIds.length === 0) {
+      return new Set();
+    }
+
+    const favorites = await this.prismaService.favorite.findMany({
+      where: { userId: currentUserId, articleId: { in: articleIds } },
+      select: { articleId: true },
+    });
+
+    return new Set(favorites.map((favorite) => favorite.articleId));
+  }
+
+  private async isFavoritedByUser(articleId: number, currentUserId?: number): Promise<boolean> {
+    if (!currentUserId) {
+      return false;
+    }
+
+    const favorite = await this.prismaService.favorite.findUnique({
+      where: { userId_articleId: { userId: currentUserId, articleId } },
+      select: { userId: true },
+    });
+
+    return !!favorite;
+  }
+
+  async getArticle(slug: string) {
+    return await this.prismaService.article.findUnique({
       where: { slug },
       select: { id: true, authorId: true },
     });
+  }
+
+  async update(slug: string, userId: number, dto: UpdateArticleDto) {
+    const existingArticle = await this.getArticle(slug);
 
     if (!existingArticle) {
       throw new NotFoundException(t('common.errors.not_found', { args: { entity: 'Article' } }));
@@ -166,10 +234,15 @@ export class ArticlesService {
           tags: {
             select: { name: true },
           },
+          _count: {
+            select: { favorites: true },
+          },
         },
       });
 
-      return { article: new ArticleResponseDto(article) };
+      const favorited = await this.isFavoritedByUser(article.id, userId);
+
+      return { article: new ArticleResponseDto(article, favorited) };
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
         throw new ConflictException(t('common.errors.already_exists', { args: { field: 'slug' } }));
@@ -194,5 +267,50 @@ export class ArticlesService {
     await this.prismaService.article.delete({ where: { slug } });
 
     return { success: true };
+  }
+
+  async favoriteArticle(slug: string, userId: number) {
+    const article = await this.getArticle(slug);
+
+    if (!article) {
+      throw new NotFoundException(t('common.errors.not_found', { args: { entity: 'Article' } }));
+    }
+
+    try {
+      await this.prismaService.favorite.create({
+        data: {
+          userId,
+          articleId: article.id,
+        },
+      });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+        throw new ConflictException(t('common.errors.already_favorited'));
+      }
+      throw new InternalServerErrorException(t('common.errors.internal_server_error'));
+    }
+
+    return this.getBySlug(slug, userId);
+  }
+
+  async unfavoriteArticle(slug: string, userId: number) {
+    const article = await this.getArticle(slug);
+
+    if (!article) {
+      throw new NotFoundException(t('common.errors.not_found', { args: { entity: 'Article' } }));
+    }
+
+    try {
+      await this.prismaService.favorite.delete({
+        where: { userId_articleId: { userId, articleId: article.id } },
+      });
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+        throw new NotFoundException(t('common.errors.not_favorited'));
+      }
+      throw new InternalServerErrorException(t('common.errors.internal_server_error'));
+    }
+
+    return this.getBySlug(slug, userId);
   }
 }

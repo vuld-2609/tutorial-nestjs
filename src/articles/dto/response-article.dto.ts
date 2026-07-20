@@ -10,6 +10,7 @@ type ArticleWithRelations = {
   updatedAt: Date;
   author: { username: string; bio: string | null; image: string | null };
   tags: { name: string }[];
+  _count: { favorites: number };
 };
 
 export class ArticleResponseDto {
@@ -40,7 +41,13 @@ export class ArticleResponseDto {
   @ApiProperty({ type: [String] })
   tags: string[];
 
-  constructor(article: ArticleWithRelations) {
+  @ApiProperty()
+  favoritesCount: number;
+
+  @ApiProperty()
+  favorited: boolean;
+
+  constructor(article: ArticleWithRelations, favorited: boolean = false) {
     this.id = article.id;
     this.title = article.title;
     this.description = article.description;
@@ -50,10 +57,54 @@ export class ArticleResponseDto {
     this.updatedAt = article.updatedAt;
     this.author = article.author;
     this.tags = article.tags.map((tag) => tag.name);
+    this.favoritesCount = article._count.favorites;
+    this.favorited = favorited;
   }
 }
 
 export class ArticleResponseWrapper {
   @ApiProperty({ type: ArticleResponseDto })
   article: ArticleResponseDto;
+}
+
+export class PaginationMetaDto {
+  @ApiProperty()
+  totalCount: number;
+
+  @ApiProperty()
+  currentPage: number;
+
+  @ApiProperty()
+  pageSize: number;
+
+  @ApiProperty()
+  totalPage: number;
+
+  @ApiProperty()
+  hasNextPage: boolean;
+
+  @ApiProperty()
+  hasPreviousPage: boolean;
+
+  constructor(meta: PaginationMetaDto) {
+    this.totalCount = meta.totalCount;
+    this.currentPage = meta.currentPage;
+    this.pageSize = meta.pageSize;
+    this.totalPage = meta.totalPage;
+    this.hasNextPage = meta.hasNextPage;
+    this.hasPreviousPage = meta.hasPreviousPage;
+  }
+}
+
+export class ArticleListResponseDto {
+  @ApiProperty({ type: [ArticleResponseDto] })
+  data: ArticleResponseDto[];
+
+  @ApiProperty({ type: PaginationMetaDto })
+  meta: PaginationMetaDto;
+
+  constructor(data: ArticleResponseDto[], meta: PaginationMetaDto) {
+    this.data = data;
+    this.meta = meta;
+  }
 }
