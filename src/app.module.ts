@@ -11,6 +11,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { UserModule } from './user/user.module';
 import { ArticlesModule } from './articles/articles.module';
 import { RedisModule } from './redis/redis.module';
+import { CommentsModule } from './comments/comments.module';
 
 @Module({
   imports: [
@@ -38,6 +39,7 @@ import { RedisModule } from './redis/redis.module';
     UserModule,
     ArticlesModule,
     RedisModule,
+    CommentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

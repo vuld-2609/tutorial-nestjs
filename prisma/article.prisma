@@ -10,4 +10,6 @@ model Article {
   authorId  Int
   author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
   tags      Tag[]    @relation("ArticleTags")
+  comments  Comment[]
+  favorites Favorite[]
 }

@@ -1,24 +1,17 @@
-import { Type } from 'class-transformer';
-import { IsInt, IsOptional, IsString, Min } from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
-export class FindAllArticlesDto {
+import { IsOptional, IsString } from 'class-validator';
+
+import { PaginationQueryDto } from '@/common/dto/pagination-query.dto';
+
+export class FindAllArticlesDto extends PaginationQueryDto {
+  @ApiPropertyOptional({ description: 'Filter articles by tag name' })
   @IsOptional()
   @IsString()
   tag?: string;
 
+  @ApiPropertyOptional({ description: 'Filter articles by author username' })
   @IsOptional()
   @IsString()
   author?: string;
-
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  @Min(1)
-  limit?: number = 10;
-
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  @Min(0)
-  offset?: number = 0;
 }

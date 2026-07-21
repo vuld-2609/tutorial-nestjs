@@ -7,6 +7,8 @@
     "not_found": "{entity} not found",
     "unauthorized": "Unauthorized",
     "invalid_credentials": "Invalid email or password",
-    "access_denied": "Access denied"
+    "access_denied": "Access denied",
+    "already_favorited": "Article already favorited",
+    "not_favorited": "Article has not been favorited"
   }
 }

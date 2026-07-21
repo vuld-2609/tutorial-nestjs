@@ -32,6 +32,10 @@ async function bootstrap() {
     .setTitle('Tutorial Nest API')
     .setDescription('API description for tutorial-nest')
     .setVersion('1.0')
+    .addBearerAuth(
+      { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
+      'access-token',
+    )
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);

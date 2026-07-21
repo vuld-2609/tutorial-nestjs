@@ -29,5 +29,11 @@
       "invalid": "Tags phải là một mảng",
       "invalid_item": "Tags phải là chuỗi"
     }
+  },
+  "comment": {
+    "body": {
+      "invalid": "Bình luận phải là chuỗi",
+      "empty": "Bình luận không được để trống"
+    }
   }
 }

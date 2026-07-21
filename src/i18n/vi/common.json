@@ -7,6 +7,8 @@
     "not_found": "Không tìm thấy {entity}",
     "unauthorized": "Không có quyền truy cập",
     "invalid_credentials": "Email hoặc mật khẩu không đúng",
-    "access_denied": "Truy cập bị từ chối"
+    "access_denied": "Truy cập bị từ chối",
+    "already_favorited": "Bài viết đã được yêu thích",
+    "not_favorited": "Bài viết chưa được yêu thích"
   }
 }
