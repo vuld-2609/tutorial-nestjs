@@ -9,6 +9,10 @@
     "invalid_credentials": "Email hoặc mật khẩu không đúng",
     "access_denied": "Truy cập bị từ chối",
     "already_favorited": "Bài viết đã được yêu thích",
-    "not_favorited": "Bài viết chưa được yêu thích"
+    "not_favorited": "Bài viết chưa được yêu thích",
+    "cannot_follow_self": "Bạn không thể tự follow chính mình",
+    "cannot_unfollow_self": "Bạn không thể tự unfollow chính mình",
+    "already_following": "Bạn đã follow người dùng này rồi",
+    "not_following": "Bạn chưa follow người dùng này"
   }
 }

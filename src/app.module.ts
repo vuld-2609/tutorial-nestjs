@@ -6,12 +6,13 @@ import { join } from 'path';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AuthModule } from './auth/auth.module';
-import { PrismaModule } from './prisma/prisma.module';
-import { UserModule } from './user/user.module';
 import { ArticlesModule } from './articles/articles.module';
-import { RedisModule } from './redis/redis.module';
+import { AuthModule } from './auth/auth.module';
 import { CommentsModule } from './comments/comments.module';
+import { PrismaModule } from './prisma/prisma.module';
+import { ProfileModule } from './profiles/profile.module';
+import { RedisModule } from './redis/redis.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -36,10 +37,10 @@ import { CommentsModule } from './comments/comments.module';
     UserModule,
     AuthModule,
     PrismaModule,
-    UserModule,
     ArticlesModule,
     RedisModule,
     CommentsModule,
+    ProfileModule,
   ],
   controllers: [AppController],
   providers: [AppService],

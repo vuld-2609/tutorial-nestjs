@@ -1,0 +1,11 @@
+model Follow {
+  createdAt DateTime @default(now())
+
+  followerId  Int
+  follower    User @relation("UserFollowers", fields: [followerId], references: [id], onDelete: Cascade)
+  followingId Int
+  following   User @relation("UserFollowing", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@id([followerId, followingId])
+  @@index([followingId])
+}
