@@ -10,16 +10,13 @@ import slugify from 'slugify';
 
 import { Prisma } from '@generated/prisma/client';
 
+import { PaginationMetaDto } from '@/common/dto/pagination-meta.dto';
 import { PrismaService } from '@/prisma/prisma.service';
 import { t } from '@/utils/i18n.util';
 
 import { CreateArticleDto } from './dto/create-article.dto';
 import { FindAllArticlesDto } from './dto/find-all-article.dto';
-import {
-  ArticleListResponseDto,
-  ArticleResponseDto,
-  PaginationMetaDto,
-} from './dto/response-article.dto';
+import { ArticleListResponseDto, ArticleResponseDto } from './dto/response-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 
 @Injectable()

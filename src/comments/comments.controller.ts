@@ -1,4 +1,14 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiBody, ApiOkResponse } from '@nestjs/swagger';
 
 import { SuccessResponseDto } from '@/common/dto/success-response.dto';
@@ -8,6 +18,7 @@ import type { TAuthenticatedUser } from '@/types/users.type';
 
 import { CommentsService } from './comments.service';
 import { CreateCommentDto, CreateCommentWrapperDto } from './dto/create-comment.dto';
+import { FindAllCommentsDto } from './dto/find-all-comment.dto';
 import { CommentListResponseDto, CommentResponseWrapperDto } from './dto/response-comment.dto';
 
 @Controller('articles/:slug/comments')
@@ -30,8 +41,8 @@ export class CommentsController {
   @UseGuards(JwtAuthGuard)
   @Get()
   @ApiOkResponse({ type: CommentListResponseDto })
-  findAllComments(@Param('slug') slug: string) {
-    return this.commentsService.findAll(slug);
+  findAllComments(@Param('slug') slug: string, @Query() query: FindAllCommentsDto) {
+    return this.commentsService.findAll(slug, query);
   }
 
   @UseGuards(JwtAuthGuard)

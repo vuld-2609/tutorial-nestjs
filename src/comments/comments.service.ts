@@ -6,10 +6,12 @@ import {
 } from '@nestjs/common';
 
 import { ArticlesService } from '@/articles/articles.service';
+import { PaginationMetaDto } from '@/common/dto/pagination-meta.dto';
 import { PrismaService } from '@/prisma/prisma.service';
 import { t } from '@/utils/i18n.util';
 
-import { CommentResponseDto } from './dto/response-comment.dto';
+import { FindAllCommentsDto } from './dto/find-all-comment.dto';
+import { CommentListResponseDto, CommentResponseDto } from './dto/response-comment.dto';
 
 @Injectable()
 export class CommentsService {
@@ -51,28 +53,45 @@ export class CommentsService {
     }
   }
 
-  async findAll(slug: string) {
-    const comments = await this.prisma.comment.findMany({
-      where: {
-        article: {
-          slug,
-        },
-      },
-      include: {
-        author: {
-          select: {
-            id: true,
-            username: true,
-            bio: true,
-            image: true,
+  async findAll(slug: string, query: FindAllCommentsDto) {
+    const { limit, page } = query;
+    const skip = (page - 1) * limit;
+
+    const where = { article: { slug } };
+
+    const [comments, totalCount] = await Promise.all([
+      this.prisma.comment.findMany({
+        where,
+        take: limit,
+        skip,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          author: {
+            select: {
+              id: true,
+              username: true,
+              bio: true,
+              image: true,
+            },
           },
         },
-      },
-    });
+      }),
+      this.prisma.comment.count({ where }),
+    ]);
 
-    return {
-      comments: comments.map((comment) => new CommentResponseDto(comment)),
-    };
+    const totalPage = Math.ceil(totalCount / limit);
+
+    return new CommentListResponseDto(
+      comments.map((comment) => new CommentResponseDto(comment)),
+      new PaginationMetaDto({
+        totalCount,
+        currentPage: page,
+        pageSize: limit,
+        totalPage,
+        hasNextPage: page < totalPage,
+        hasPreviousPage: page > 1,
+      }),
+    );
   }
 
   async deleteComment(slug: string, id: number, userId: number) {

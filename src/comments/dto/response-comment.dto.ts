@@ -1,5 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+import { PaginationMetaDto } from '@/common/dto/pagination-meta.dto';
+
 type CommentWithRelation = {
   id: number;
   articleId: number;
@@ -56,4 +58,12 @@ export class CommentResponseWrapperDto {
 export class CommentListResponseDto {
   @ApiProperty({ type: [CommentResponseDto] })
   comments: CommentResponseDto[];
+
+  @ApiProperty({ type: PaginationMetaDto })
+  meta: PaginationMetaDto;
+
+  constructor(comments: CommentResponseDto[], meta: PaginationMetaDto) {
+    this.comments = comments;
+    this.meta = meta;
+  }
 }

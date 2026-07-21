@@ -1,9 +1,10 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
-import { Type } from 'class-transformer';
-import { IsInt, IsOptional, IsString, Min } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 
-export class FindAllArticlesDto {
+import { PaginationQueryDto } from '@/common/dto/pagination-query.dto';
+
+export class FindAllArticlesDto extends PaginationQueryDto {
   @ApiPropertyOptional({ description: 'Filter articles by tag name' })
   @IsOptional()
   @IsString()
@@ -13,18 +14,4 @@ export class FindAllArticlesDto {
   @IsOptional()
   @IsString()
   author?: string;
-
-  @ApiPropertyOptional({ description: 'Number of articles per page', default: 10, minimum: 1 })
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  @Min(1)
-  limit: number = 10;
-
-  @ApiPropertyOptional({ description: 'Page number', default: 1, minimum: 1 })
-  @IsOptional()
-  @Type(() => Number)
-  @IsInt()
-  @Min(1)
-  page: number = 1;
 }

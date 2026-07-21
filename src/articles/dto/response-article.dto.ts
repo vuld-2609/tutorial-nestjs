@@ -1,5 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+import { PaginationMetaDto } from '@/common/dto/pagination-meta.dto';
+
 type ArticleWithRelations = {
   id: number;
   title: string;
@@ -65,35 +67,6 @@ export class ArticleResponseDto {
 export class ArticleResponseWrapper {
   @ApiProperty({ type: ArticleResponseDto })
   article: ArticleResponseDto;
-}
-
-export class PaginationMetaDto {
-  @ApiProperty()
-  totalCount: number;
-
-  @ApiProperty()
-  currentPage: number;
-
-  @ApiProperty()
-  pageSize: number;
-
-  @ApiProperty()
-  totalPage: number;
-
-  @ApiProperty()
-  hasNextPage: boolean;
-
-  @ApiProperty()
-  hasPreviousPage: boolean;
-
-  constructor(meta: PaginationMetaDto) {
-    this.totalCount = meta.totalCount;
-    this.currentPage = meta.currentPage;
-    this.pageSize = meta.pageSize;
-    this.totalPage = meta.totalPage;
-    this.hasNextPage = meta.hasNextPage;
-    this.hasPreviousPage = meta.hasPreviousPage;
-  }
 }
 
 export class ArticleListResponseDto {
