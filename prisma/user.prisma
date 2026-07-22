@@ -9,6 +9,8 @@ model User {
   articles  Article[]
   comments Comment[]
   favorites Favorite[]
+  followers Follow[] @relation("UserFollowers")
+  following Follow[] @relation("UserFollowing")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
